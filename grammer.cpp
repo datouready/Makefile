@@ -82,3 +82,126 @@
 // 第二顺序：g++内置的系统路径，一般是usr/include...等等,g++ -print-search-dirs可以打印出来
 // 第三顺序：系统环境变量配置的路径，例如：C_INCLUDE_PATH,CPP_INCLUDE_PATH
 
+// 三、Makefile基本语法依赖关系定义
+// 1、make指令执行时，默认会查找当前目录下的makefile、Makefile文件
+// 作为代码文件，当然也可以make -f abc的方式，指定make运行的Makefile代码
+// 2、Makefile主要解决的问题是，描述生成依赖关系，根据生成和依赖文件修改时间新旧决定是否执行command。可手动调用g++进行编译，
+// 重点是，如果每次编译，都是全体代码参与，对于没有修改部分的代码编译，是浪费时间。项目文件越多，这个问题越严重。
+// 而Makefile帮我们解决这个问题
+// 3、Makefile的重点有：描述依赖关系、command(生成文件的指令)
+// 4、我们只需要学习Makefile的基本操作足以应付项目需求即可，并不需要学习全部语法
+
+// 定义变量var:=folder
+// 生成main.o依赖main.cpp
+// 若main.cpp的修改时间比main.o更早更新
+// 则触发执行shell指令g++ -c main.cpp -o main.o
+// main.o : main.cpp    依赖定义域   main.o是生成项、main.cpp是依赖项
+//     g++ -c main.cpp -o main.o    command需要跟依赖定义具有空格隔开，表示下级，一般是4个空格（即tab）
+// 当执行make main.o时，会检查main.o和main.cpp的修改时间，决定是否执行生成指令：g++ -c main.cpp -o main.o
+
+// 生成项可以没有依赖项，那么如果该生成项文件不存在,command将永远执行
+// debug:
+//     @echo a = $(a) 打印出a=...之类的内容，  @echo是打印出后面的内容
+
+// Makefile基础-makefile语法
+// 1、数据类型，字符串和字符串数组
+// 2、定义变量，var:=folder,定义变量var，为string类型，值是folder
+// 3、定义数组，var:=hello world folder,定义变量var，为数组类型，值是["hello","world","folder"]
+// 4、定义的方式有多种
+// = 赋值   var = folder 基本赋值,Makefile全部执行后决定取值（不常用）
+// :=赋值   var:=folder  基本赋值，当前所在位置决定取值（常用）
+// ？=赋值  var?=folder  如果没有赋值，则赋值为folder
+// +=赋值   var+=folder  添加值，在var后面添加值。可以认为数组后面增加元素
+// append,var:=hello,var+=world,结果是hello world,中间有空格
+// 5、$(var),${var}，在这个位置解释为var的值，例如: var2 := $(var)
+// 6、$(func param),调用Make提供的内置函数
+// 例如：var:=$(shell echo hello),定义var值为执行shell echo hello后输出
+// 例如：$(info $(var)),直接打印var变量内容
+// 例如：var:=$(subst a,x,aabbcc),替换aabbcc中的a为x后赋值给var，结果xxbbcc
+// 7、逻辑语法：ifeq、ifneq、ifdef、ifndef
+// ifeq($(var),depends)
+//     name:=hello
+// endif
+
+// #定义变量a，赋值为folder
+// a:=folder
+
+// #为变量a，增加内容directory,结果是：folder directory
+// a+=directory
+
+// #定义变量c，为执行ls指令后的输出字符串
+// c:=$(shell ls)
+
+// #定义变量d，为把xiao中的x，替换为a。结果是：aiao
+// d:=$(subst x,a,xiao)
+
+// #定义变量e，为在a每个元素前面增加-L符号，结果是：-Lfolder -Ldirectory
+// e:=$(patsubst%,-L%,$(a))
+
+// #打印变量e的内容
+// $(info e=$(e))
+// @echo  e=$(e)   这个好像也可以
+
+// Makefile基础-总结
+// 1、变量赋值有4种方式var=123、var:=123、var?=123、var+=123
+// 其中var:=123常用
+// var+=123常用
+// 2、取变量值有两种,$(var),${var}。小括号大括号均可以
+// 3、数据类型只有字符串和字符串数组，空格隔开表示多个元素
+// 4、$(function arguments)是调用make内置函数的方法，具体可以参考：
+// http://www.gnu.org/software/make/manual/make.html#Syntax-of-Functions
+// 有函数大全。但是常用的其实只有少数两个即可
+// 5、依赖关系定义中，如果代码修改时间比生成的更新/生成不存在时，command会执行。
+// 否则只会打印main.o is up to date这是makefile解决的核心问题。
+// 6、依赖关系可以链式的定义，即b依赖a，c依赖b，而make会自动链式的查找并根据时间执行command
+// 7、command时shell命令，可以使用$(var)来将变量用到其中。
+// 前面加@表示执行 执行时不打印原指令内容。否则默认打印指令后再执行指令
+// 8、make不写具体生成名称，则会选择依赖关系中的第一项生成
+
+// 4、基于Makefile的标准工程结构
+// 一个标准工程，我们做如下定义：
+// 1、具有src目录，存放我们的代码，可能有多级，例如main.cpp,foo/foo.cpp等
+// 2、具有workspace目录，存放我们编译后的可执行程序、资源、数据
+// 3、具有objs目录，存放由cpp编译后得到的o文件等中间文件
+// 4、.vscode目录，存放vscode的cpp配置，用于语法解析器。vscode的c++插件所使用。ctrl+shift+p后搜索c++，找到JSON那一项就是
+// 5、Makefile文件，当前工程的Makefile代码
+
+// 实现例子在Makefile里面
+
+// 5、基于Makefile实现的完整功能项目
+// 实现的目的：
+// 1、具有两个依赖，openssl、libcurl
+// 2、存在include、libs依赖
+// 3、可以锻炼一个完整的相对完善的工程案例。还可以锻炼到代码调试
+
+// 实现的效果：
+// 实现一个程序，可以从任何网站上下载东西
+
+// 准备：
+// 1、下载openssl:https://www.openssl.org/source/old/1.1.1/openssl-1.1.1j.tar.gz
+// 2、下载libcurl:https://curl.se/download/curl-7.78.0.tar.gz
+
+// 创建build目录，用于储存下载后的文件，准备用来编译
+// 创建lean目录，用于存放编译后的结果，作为依赖项目录
+// 将下载后的.tar.gz放到build目录下，并解压出来
+
+// 6、分析程序依赖项、readelf、ldd
+// 例如使用readelf -d指令，我们可以查看到程序依赖的so文件以及run path路径
+// ldd指令可以查看该程序依赖的so，查找到的具体路径。看看是否符合预期
+// 因为 如果不符合预期，会发生莫名其妙的错误，这个千万要不得。我们一定要让他符合我们的预期
+
+// 7、配置C++的调试功能
+// 使用vscode调试功能
+
+// 8、头文件修改cpp自动编译的处理方法
+// 问题:如果增加a.o : a.hpp。但是a.hpp来自于a.cpp的#include语法。我们可能随时修改a.cpp依赖不同的hpp文件，如何自动完成？
+// 可以每次make clean，但不是很好的办法
+// 使用下面的命令
+// g++ -MM a.cpp -MF a.mk -MT prefix/a.o
+// 该指令产生a.mk文件，里面写了a.cpp依赖的头文件
+// a.mk本身就是makefile语法。他解析了a.cpp的全部头文件后分析
+// 所有依赖的头文件，并写成makefile语法
+// -MM分析 #include "a.hpp" ,引号类型的包含
+// -M 分析全部包含，尖括号和引号
+// -MF 指定储存路径
+// -MT 指定依赖项名称
