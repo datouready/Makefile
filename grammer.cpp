@@ -31,7 +31,7 @@
 // g++ -c a.cpp -o a.o
 // g++ -c b.cpp -o b.o
 // 动态库 lib3rd.so
-// 静态库 libpkg.a
+// 静态库 libpkg.a  //库都是在链接这一步使用的
 // g++ a.o b.o -l3rd -lpkg -o out.bin
 
 // C++编译过程

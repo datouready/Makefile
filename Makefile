@@ -4,7 +4,7 @@
 srcs := $(shell find src -name "*.cpp")
 
 #将srcs的后缀为.cpp的替换为.o  这里srcs:.cpp=.o意思是srcs里面的所有.cpp结尾的全部变成.o结尾
-objs := $(srcs:.cpp=.o=.mk) #将所有objs文件的.o改为.mk，得到mks
+objs := $(srcs:.cpp=.o) #将所有objs文件的.o改为.mk，得到mks
 
 #将src/前缀替换为objs/前缀，让o文件放到objs目录下   objs:src/%=objs/%意思将objs里面src/开头的，全部变成objs/
 objs:=$(objs:src/%=objs/%)
