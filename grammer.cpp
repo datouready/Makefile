@@ -66,3 +66,19 @@
 // 第二顺序：out.bin中储存的rpath(run path)。readelf -d out.bin指令可以查看文件的runpath信息。
 // 如果该选项指定了依旧失效，说明依赖的so文件还存在更多依赖在其他目录没有明确（常用）
 // 第三顺序：环境变量指定的目录（例如LD_LIBRARY_PATH）
+
+// C++编译时，头文件查找方式
+// g++ -lfolder
+// 当程序编译时，头文件该如何查找呢：
+// g++ -lfolder表示配置一个头文件查找目录
+
+// 当#include "path/name.hpp" 使用双引号时：
+// 编译器会在当前文件的目录下查找path/name.hpp,例如我们在/data/a.cpp中写了
+// #include "path/name.hpp"，最终确认的路径是/data/path/name.hpp
+
+// 当#include <path/name.hpp>使用尖括号时：
+// 第一顺序：以g++ -I配置的路径查找，例如g++ -I/data/folder,确认路径是：
+// /data/folder/path/name.hpp,对所有路径都进行测试，找到为止
+// 第二顺序：g++内置的系统路径，一般是usr/include...等等,g++ -print-search-dirs可以打印出来
+// 第三顺序：系统环境变量配置的路径，例如：C_INCLUDE_PATH,CPP_INCLUDE_PATH
+
