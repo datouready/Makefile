@@ -4,12 +4,12 @@
 srcs := $(shell find src -name "*.cpp")
 
 #将srcs的后缀为.cpp的替换为.o  这里srcs:.cpp=.o意思是srcs里面的所有.cpp结尾的全部变成.o结尾
-objs := $(srcs:.cpp=.o) #将所有objs文件的.o改为.mk，得到mks
+objs := $(srcs:.cpp=.o) 
 
 #将src/前缀替换为objs/前缀，让o文件放到objs目录下   objs:src/%=objs/%意思将objs里面src/开头的，全部变成objs/
 objs:=$(objs:src/%=objs/%)
 
-mks := $(objs:.o)
+mks := $(objs:.o=.mk) #将所有objs文件的.o改为.mk，得到mks
 
 include_paths := /data/sxai/makefile/make7/lean/curl7.78.0/include \
 				/data/sxai/makefile/make7/lean/openssl-1.1.1j/include #1、增加include_paths选项，因为头文件需要他们
