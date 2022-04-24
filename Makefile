@@ -1,4 +1,4 @@
-#vscode右下角更改space和Tab
+#vscode右下角更改space和Tab,防止无法使用缩进来识别命令
 
 # 检索src目录查找cpp为后缀文件，用shell指令的find
 srcs := $(shell find src -name "*.cpp")
