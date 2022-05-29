@@ -17,16 +17,18 @@ include_paths := /data/sxai/makefile/make7/lean/curl7.78.0/include \
 library_paths := /data/sxai/makefile/make7/lean/curl7.78.0/lib \
 				/data/sxai/makefile/make7/lean/openssl-1.1.1j/lib #2、增加了ld_librarys选项，因为需要链接他们
 
-ld_librarys := curl ssl crypto
+ld_librarys := curl ssl crypto # 增加库文件名
 
 #把每一个头文件路径前面增加-I,库文件路径前面增加-L，链接选项前面加-l
+
 #3、使用$(var:source=dest)语法，将每个路径前面加上特定符号，变为g++的指令需要
+
 #-I是配置头文件路径、-L配置库文件路径、-lname配置依赖的so
 #4、增加compile_flags,增加编译选项，例如我们要使用C++11特性等，-w避免警告，-g生成调试信息,-O0优化级别关闭
 #5、把编译选项增加到g++编译后面
 #6、把链接选项增加到g++链接后面
 run_paths     := $(library_paths:%=-Wl,rpath=%)
-#增加run_paths变量，他的语法是：g++ main.o test.o -o out.bin -WL,-rpath=/xxx/openssl/lib
+#增加run_paths变量，他的语法是：g++ main.o test.o -o out.bin           -WL,-rpath=           /xxx/openssl/lib
 include_paths := $(include_paths:%=-I%)
 library_paths := $(library_paths:%=-L%)
 ld_librarys   := $(ld_librarys:%=-l%)
