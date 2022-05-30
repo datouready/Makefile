@@ -48,6 +48,12 @@ objs/%.o : src/%.cpp         #代表了通配依赖关系，是模式匹配，%�
 	@mkdir -p $(dir $@)
 	g++ -c $< -o $@ $(compile_flags)
 
+# 这里可以增加nvcc编译
+$(objdir)/%.cu.o : $(srcdir)/%.cu
+	@echo Compile CUDA $<
+	@mkdir -p $(dir $@)
+	@$(nvcc) -c $< -o $@ $(cu_compile_flags)
+
 # $^ = 右边依赖项全部
 # 我们把pro放到workspace下面
 workspace/pro : $(objs)
