@@ -69,6 +69,7 @@ objs/%.mk : src/%.cpp
 	@g++ -MM $< -MF $@ -MT $(@:.mk = .o)
 
 #定义简洁指令，make pro即可生成程序
+#加上@表示不显示命令echo
 pro : workspace/pro
 	@echo 编译完成
 
